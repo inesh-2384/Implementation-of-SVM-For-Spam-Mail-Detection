@@ -23,9 +23,8 @@ Program to implement the SVM For Spam Mail Detection.
 Developed by: INESH N
 RegisterNumber: 212223220036
 ```
-# ---------------------------------------------------------
-# Step 1: Import Required Libraries
-# ---------------------------------------------------------
+```
+# Step 1: Import Libraries
 import chardet
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -33,70 +32,50 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import SVC
 from sklearn import metrics
 
-# ---------------------------------------------------------
-# Step 2: Detect File Encoding
-# ---------------------------------------------------------
-with open("/content/spam.csv", 'rb') as f:
+# Step 2: Detect Encoding
+with open("spam.csv", 'rb') as f:
     result = chardet.detect(f.read())
 encoding_used = result['encoding']
 print("Detected encoding:", encoding_used)
 
-# ---------------------------------------------------------
-# Step 3: Load Data Using Detected Encoding
-# ---------------------------------------------------------
+# Step 3: Load Data
 data = pd.read_csv("spam.csv", encoding=encoding_used)
 print("Dataset loaded successfully.")
 
-# ---------------------------------------------------------
-# Step 4: Inspect Dataset
-# ---------------------------------------------------------
-print("\nDataset Info:")
+# Step 4: Inspect Data
+print("\nData Info:")
 print(data.info())
 
 print("\nMissing Values:")
 print(data.isnull().sum())
 
-# NOTE:
-# Some spam datasets have column names like 'v1', 'v2'
-# v1 -> label (spam/ham)
-# v2 -> message text
-# Adjust if needed
+# Rename columns if necessary (common for spam datasets)
 data.columns = ["label", "text"] + list(data.columns[2:])
 
-# ---------------------------------------------------------
-# Step 5: Extract Text (x) and Labels (y)
-# ---------------------------------------------------------
+# Step 5: Split Into x and y
 x = data["text"]
 y = data["label"]
 
-# Train-Test Split
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, test_size=0.2, random_state=42
 )
 
-# ---------------------------------------------------------
-# Step 6: Convert Text to Numerical Data (Vectorization)
-# ---------------------------------------------------------
+# Step 6: Vectorization
 cv = CountVectorizer()
 x_train_cv = cv.fit_transform(x_train)
 x_test_cv = cv.transform(x_test)
 
-# ---------------------------------------------------------
 # Step 7: Train SVM Model
-# ---------------------------------------------------------
 model = SVC()
 model.fit(x_train_cv, y_train)
 
-# ---------------------------------------------------------
-# Step 8: Predict Labels
-# ---------------------------------------------------------
+# Step 8: Predict
 y_pred = model.predict(x_test_cv)
 
-# ---------------------------------------------------------
-# Step 9: Evaluate Model
-# ---------------------------------------------------------
+# Step 9: Model Evaluation
 accuracy = metrics.accuracy_score(y_test, y_pred)
 print("\nSVM Model Accuracy:", accuracy)
+```
 
 
 ## Output:
