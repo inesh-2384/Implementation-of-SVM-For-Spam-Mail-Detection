@@ -23,60 +23,84 @@ Program to implement the SVM For Spam Mail Detection.
 Developed by: INESH N
 RegisterNumber: 212223220036
 ```
-```
+# ---------------------------------------------------------
+# Step 1: Import Required Libraries
+# ---------------------------------------------------------
 import chardet
-file='spam.csv'
-with open(file, 'rb') as rawdata:
-    result = chardet.detect (rawdata.read(100000))
-result
-```
-```
 import pandas as pd
-data=pd.read_csv('spam.csv', encoding='Windows-1252')
-```
-```
-data.info()
-```
-```
-data.isnull().sum()
-```
-```
-x=data["v1"].values
-y=data["v2"].values
-```
-```
 from sklearn.model_selection import train_test_split
-x_train, x_test, y_train,y_test=train_test_split(x,y,test_size=0.2, random_state=0)
-```
-```
 from sklearn.feature_extraction.text import CountVectorizer
-cv = CountVectorizer()
-```
-```
-x_train=cv.fit_transform(x_train)
-x_test=cv.transform(x_test)
-```
-```
 from sklearn.svm import SVC
-svc=SVC()
-svc.fit(x_train, y_train)
-y_pred=svc.predict(x_test)
-y_pred
-```
-```
 from sklearn import metrics
-accuracy=metrics.accuracy_score(y_test,y_pred)
-accuracy
-```
+
+# ---------------------------------------------------------
+# Step 2: Detect File Encoding
+# ---------------------------------------------------------
+with open("/content/spam.csv", 'rb') as f:
+    result = chardet.detect(f.read())
+encoding_used = result['encoding']
+print("Detected encoding:", encoding_used)
+
+# ---------------------------------------------------------
+# Step 3: Load Data Using Detected Encoding
+# ---------------------------------------------------------
+data = pd.read_csv("spam.csv", encoding=encoding_used)
+print("Dataset loaded successfully.")
+
+# ---------------------------------------------------------
+# Step 4: Inspect Dataset
+# ---------------------------------------------------------
+print("\nDataset Info:")
+print(data.info())
+
+print("\nMissing Values:")
+print(data.isnull().sum())
+
+# NOTE:
+# Some spam datasets have column names like 'v1', 'v2'
+# v1 -> label (spam/ham)
+# v2 -> message text
+# Adjust if needed
+data.columns = ["label", "text"] + list(data.columns[2:])
+
+# ---------------------------------------------------------
+# Step 5: Extract Text (x) and Labels (y)
+# ---------------------------------------------------------
+x = data["text"]
+y = data["label"]
+
+# Train-Test Split
+x_train, x_test, y_train, y_test = train_test_split(
+    x, y, test_size=0.2, random_state=42
+)
+
+# ---------------------------------------------------------
+# Step 6: Convert Text to Numerical Data (Vectorization)
+# ---------------------------------------------------------
+cv = CountVectorizer()
+x_train_cv = cv.fit_transform(x_train)
+x_test_cv = cv.transform(x_test)
+
+# ---------------------------------------------------------
+# Step 7: Train SVM Model
+# ---------------------------------------------------------
+model = SVC()
+model.fit(x_train_cv, y_train)
+
+# ---------------------------------------------------------
+# Step 8: Predict Labels
+# ---------------------------------------------------------
+y_pred = model.predict(x_test_cv)
+
+# ---------------------------------------------------------
+# Step 9: Evaluate Model
+# ---------------------------------------------------------
+accuracy = metrics.accuracy_score(y_test, y_pred)
+print("\nSVM Model Accuracy:", accuracy)
+
 
 ## Output:
-<img width="1086" height="545" alt="Screenshot 2025-10-30 090201" src="https://github.com/user-attachments/assets/7c056ded-f96d-40a4-b497-b91bbe635549" />
-
-<img width="894" height="590" alt="Screenshot 2025-10-30 090215" src="https://github.com/user-attachments/assets/4a534ff4-a573-409f-b43b-f8194289e537" />
-
-<img width="1011" height="447" alt="Screenshot 2025-10-30 090222" src="https://github.com/user-attachments/assets/40befba1-d514-4959-9c82-b8c6ac483f7a" />
-
-
+<img width="460" height="600" alt="image" src="https://github.com/user-attachments/assets/be69d488-72db-4af1-8708-ef506112a2a7" />
 
 
 
